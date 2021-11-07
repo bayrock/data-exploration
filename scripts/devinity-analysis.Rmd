@@ -1,0 +1,33 @@
+---
+title: "Data Exploration for Devinity.org (Garry's Mod Flood)"
+author: "Bayrock"
+#date: "11/7/2021"
+output: 
+  html_document:
+    code_folding: "show"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r Load libraries}
+library(dplyr)
+library(ggplot2)
+```
+
+## Prop spawns
+
+Let's start off by importing and cleaning our prop statistics. I'll filter props that have 0 spawns, as they should be irrelevant to the rest of our analysis.
+
+```{r Load and clean data}
+props <- read.csv(file = 'data/propstatistics.csv') %>%
+  filter(spawns != 0)
+```
+
+Now let's check out the data set:
+
+```{r Show prop stats dataframe}
+props
+```
