@@ -1,0 +1,68 @@
+---
+title: "Data Exploration for Devinity.org (Garry's Mod Flood)"
+#author: "Bayrock"
+#date: "11/7/2021"
+output: github_document
+---
+
+```{r Setup knitr, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r Load libraries and set theme, include=FALSE}
+library(dplyr)
+library(stringr)
+library(ggplot2)
+
+theme_set(theme_classic())
+```
+
+### Prop spawns
+
+Let's start off by importing and cleaning our prop statistics. I'll filter props with 0 spawns, as they should be irrelevant to the rest of our analysis:
+
+```{r Load and clean data}
+props <- read.csv(file = 'data/propstatistics.csv') %>%
+  filter(spawns != 0) %>%
+  #filter(!str_detect(model, "")) %>%
+  mutate(model = str_replace(model, ".+/", "")) %>%
+  mutate(model = str_replace(model, ".mdl", "")) %>%
+  arrange(desc(spawns))
+
+top10props <- props %>%
+  slice(1:10)
+```
+
+Now let's check out the data set:
+
+```{r Prop stats dataframe}
+top10props
+```
+
+That's a useful overview, but let's also see some visualizations:
+
+```{r Top 10 most spawned props}
+ggp <- ggplot(top10props, aes(reorder(model, spawns), spawns)) +
+  geom_col() +
+  coord_flip() +
+  labs(title="Top 10 most spawned props", caption="Devinity.org") +
+  theme(axis.text.x = element_text(angle=90, vjust=0.6))
+  
+ggp
+```
+
+```{r Optional plotly call, include=FALSE}
+#plotly::ggplotly(ggp)
+```
+
+```{r Top 10 least spawned props}
+bottom10props <- props %>%
+  slice(n():(n()-10))
+
+ggp2 <- ggp %+% bottom10props +
+  aes(reorder(model, -spawns), spawns) +
+  labs(title="Top 10 least spawned props")
+
+ggp2
+```
